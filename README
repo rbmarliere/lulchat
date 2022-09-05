@@ -1,0 +1,45 @@
+lulchat
+
+
+INTRODUCTION
+
+This is a small proof of concept that aim to provide a basic chat functionality
+with end to end encryption. It was a mere exercise solely for learning purposes.
+By no means rely on this software for secure communication!
+
+HOW IT WORKS
+
+Basically whenever you type a message, the client will (before sending
+anything):
+    1. Encrypt the message using every key stored in your authorized_keys file.
+    2. Encrypt the resultant data structure again, using a shared AES key with
+    the server.
+
+Connects to a server and sends out encrypted messages and decrypts received
+messages. To authenticate to the chat server, the client first sends out an AES
+encrypted password. The server then compares it's md5 hash to a locally stored
+hash. If it matches up then the user is authenthicated and can see all the
+traffic being relayed by the server. However, even if some rogue connecting
+entity were to have the password they would still need at least one of the two
+clients private RSA keys to be able to spoof an identity. Otherwise they would
+only be able to see encrypted traffic being relayed on the server.
+
+QUICK SETUP REFERENCE
+
+Just make sure you understand the GLOBALS used on both scripts!
+
+    1. Generate a RSA keypair with:
+    `ssh-keygen -t rsa -b 2048 -f id_rsa -N '' -C ''`
+    2. Share the PUBLIC key to whoever you will be chatting.
+    3. Get those PUBLIC keys shared with you and put them inside the file
+    keys/authorized_keys. Each line should have a valid RSA public key in the
+    OpenSSH format.
+    4. Configure the client by customizing its globals so that it fits your
+    needs. Beware to have a shared AES_KEY set between all clients and the
+    server.
+
+In case you're hosting the server, then you just need to set the server globals.
+Get the plain text server password that the clients will be sending and then
+store its hash in its respective global (SERVER_PASSWD @ server.py), then run
+the server!
+
